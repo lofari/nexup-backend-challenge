@@ -101,7 +101,8 @@ Los modelos (`Product`, `Sale`, `BusinessHours`) se encuentran en `domain.model`
 
 ### Tests
 
-54 tests cubriendo:
+60 tests cubriendo:
 - Caminos exitosos para todas las funcionalidades requeridas
-- Casos límite (sin ventas, menos de 5 productos, cadena vacía, venta de todo el stock)
-- Validación de errores (IDs inválidos, stock insuficiente, datos negativos, IDs duplicados)
+- Casos límite (sin ventas, menos de 5 productos, exactamente 5 productos, cadena vacía, venta de todo el stock, productos con precio cero)
+- Aislamiento de datos (los ingresos de un producto no afectan a otros, múltiples supermercados abiertos simultáneamente)
+- Validación de errores (IDs inválidos, stock insuficiente, datos negativos, IDs duplicados, stock agotado)

@@ -82,6 +82,18 @@ class SupermarketChainTest {
     }
 
     @Test
+    fun `getTopFiveProducts should return exactly 5 when 5 products sold`() {
+        supermarketA.registerSale(1, 10)
+        supermarketA.registerSale(2, 8)
+        supermarketA.registerSale(3, 6)
+        supermarketA.registerSale(4, 4)
+        supermarketA.registerSale(5, 2)
+
+        val result = chain.getTopFiveProducts()
+        assertEquals("Carne: 10 - Pescado: 8 - Pollo: 6 - Cerdo: 4 - Ternera: 2", result)
+    }
+
+    @Test
     fun `getTopFiveProducts should return fewer than 5 if not enough products sold`() {
         supermarketA.registerSale(1, 10)
         supermarketA.registerSale(2, 5)
@@ -125,6 +137,12 @@ class SupermarketChainTest {
     }
 
     @Test
+    fun `getHighestRevenueSupermarket should return first supermarket when no sales`() {
+        val result = chain.getHighestRevenueSupermarket()
+        assertEquals("Supermercado A (1). Ingresos totales: 0", result)
+    }
+
+    @Test
     fun `getHighestRevenueSupermarket should throw when chain is empty`() {
         val emptyChain = SupermarketChain(emptyList())
         assertThrows<IllegalStateException> {
@@ -144,6 +162,20 @@ class SupermarketChainTest {
     fun `getOpenSupermarketsAt should return weekend supermarket on Saturday`() {
         val result = chain.getOpenSupermarketsAt(DayOfWeek.SATURDAY, LocalTime.of(11, 0))
         assertEquals("Supermercado B (2)", result)
+    }
+
+    @Test
+    fun `getOpenSupermarketsAt should return multiple supermarkets when several are open`() {
+        val sharedHours = BusinessHours(
+            LocalTime.of(9, 0), LocalTime.of(21, 0),
+            setOf(DayOfWeek.MONDAY)
+        )
+        val smA = Supermarket(1, "A", mapOf(carne to 10), sharedHours)
+        val smB = Supermarket(2, "B", mapOf(carne to 10), sharedHours)
+        val multiChain = SupermarketChain(listOf(smA, smB))
+
+        val result = multiChain.getOpenSupermarketsAt(DayOfWeek.MONDAY, LocalTime.of(12, 0))
+        assertEquals("A (1), B (2)", result)
     }
 
     @Test

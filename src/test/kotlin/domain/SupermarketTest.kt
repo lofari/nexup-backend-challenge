@@ -100,6 +100,14 @@ class SupermarketTest {
         }
     }
 
+    @Test
+    fun `registerSale should throw after stock is fully depleted`() {
+        supermarket.registerSale(2, 50)
+        assertThrows<IllegalArgumentException> {
+            supermarket.registerSale(2, 1)
+        }
+    }
+
     // --- getQuantitySold ---
 
     @Test
@@ -142,6 +150,13 @@ class SupermarketTest {
         }
     }
 
+    @Test
+    fun `getSalesRevenue should not include other products`() {
+        supermarket.registerSale(1, 3) // 30.0
+        supermarket.registerSale(2, 2) // 40.0
+        assertEquals(BigDecimal("30.0"), supermarket.getSalesRevenue(1))
+    }
+
     // --- getTotalRevenue ---
 
     @Test
@@ -154,6 +169,14 @@ class SupermarketTest {
     @Test
     fun `getTotalRevenue should return zero when no sales`() {
         assertEquals(BigDecimal.ZERO, supermarket.getTotalRevenue())
+    }
+
+    @Test
+    fun `getTotalRevenue should be zero for zero-price product`() {
+        val free = Product(3, "Gratis", BigDecimal.ZERO)
+        val sm = Supermarket(1, "Test", mapOf(free to 10))
+        sm.registerSale(3, 5)
+        assertEquals(BigDecimal.ZERO, sm.getTotalRevenue())
     }
 
     // --- isOpenAt ---
