@@ -76,3 +76,32 @@ Se espera obtener la respuesta como un _string_ con el formato `<nombre_supermer
 ## Entregables
 - Un enlace a un repositorio de GitHub con el código resolviendo el problema planteado.
 - Opcional: Un archivo README con explicaciones sobre el enfoque utilizado y cualquier otra información relevante.
+
+## Enfoque y decisiones de diseño
+
+### Estructura del proyecto
+
+```
+src/main/kotlin/
+├── domain/
+│   ├── model/          # Objetos de valor: Product, Sale, BusinessHours
+│   ├── Supermarket.kt  # Lógica de ventas, stock y horarios por sucursal
+│   └── SupermarketChain.kt  # Agregación y consultas sobre la cadena
+└── Main.kt             # Demo de uso
+```
+
+Los modelos (`Product`, `Sale`, `BusinessHours`) se encuentran en `domain.model` como objetos de valor inmutables (data classes). Las clases con lógica de negocio (`Supermarket`, `SupermarketChain`) se encuentran directamente en `domain`.
+
+### Decisiones técnicas
+
+- **`BigDecimal` para valores monetarios**: Se evita `Double` para prevenir errores de precisión en cálculos de dinero (por ejemplo, `0.1 + 0.2 != 0.3` con punto flotante).
+- **Validación fail-fast con `require`**: Todos los constructores validan sus invariantes al momento de creación (IDs positivos, nombres no vacíos, stock no negativo, etc.). Esto garantiza que no existan objetos en estado inválido.
+- **Copias defensivas**: `getSales()` retorna una copia de la lista interna para evitar modificaciones externas al estado del supermercado.
+- **Horarios nocturnos**: `BusinessHours` soporta horarios que cruzan la medianoche (por ejemplo, 22:00 a 06:00), verificando tanto el día actual como el día anterior.
+
+### Tests
+
+54 tests cubriendo:
+- Caminos exitosos para todas las funcionalidades requeridas
+- Casos límite (sin ventas, menos de 5 productos, cadena vacía, venta de todo el stock)
+- Validación de errores (IDs inválidos, stock insuficiente, datos negativos, IDs duplicados)
