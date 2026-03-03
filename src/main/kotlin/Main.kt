@@ -1,18 +1,19 @@
 import domain.Supermarket
 import domain.SupermarketChain
-import model.BusinessHours
-import model.Product
+import domain.model.BusinessHours
+import domain.model.Product
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalTime
 
 fun main() {
     // Set up products
-    val carne = Product(1, "Carne", 10.0)
-    val pescado = Product(2, "Pescado", 20.0)
-    val pollo = Product(3, "Pollo", 30.0)
-    val cerdo = Product(4, "Cerdo", 45.0)
-    val ternera = Product(5, "Ternera", 50.0)
-    val cordero = Product(6, "Cordero", 65.0)
+    val carne = Product(1, "Carne", BigDecimal("10.0"))
+    val pescado = Product(2, "Pescado", BigDecimal("20.0"))
+    val pollo = Product(3, "Pollo", BigDecimal("30.0"))
+    val cerdo = Product(4, "Cerdo", BigDecimal("45.0"))
+    val ternera = Product(5, "Ternera", BigDecimal("50.0"))
+    val cordero = Product(6, "Cordero", BigDecimal("65.0"))
 
     val allProducts = mapOf(
         carne to 100, pescado to 100, pollo to 100,

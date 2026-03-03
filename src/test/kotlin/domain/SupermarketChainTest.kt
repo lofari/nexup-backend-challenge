@@ -1,11 +1,13 @@
 package domain
 
-import model.BusinessHours
-import model.Product
+import domain.model.BusinessHours
+import domain.model.Product
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -25,12 +27,12 @@ class SupermarketChainTest {
 
     @BeforeEach
     fun setUp() {
-        carne = Product(1, "Carne", 10.0)
-        pescado = Product(2, "Pescado", 20.0)
-        pollo = Product(3, "Pollo", 30.0)
-        cerdo = Product(4, "Cerdo", 45.0)
-        ternera = Product(5, "Ternera", 50.0)
-        cordero = Product(6, "Cordero", 65.0)
+        carne = Product(1, "Carne", BigDecimal("10.0"))
+        pescado = Product(2, "Pescado", BigDecimal("20.0"))
+        pollo = Product(3, "Pollo", BigDecimal("30.0"))
+        cerdo = Product(4, "Cerdo", BigDecimal("45.0"))
+        ternera = Product(5, "Ternera", BigDecimal("50.0"))
+        cordero = Product(6, "Cordero", BigDecimal("65.0"))
 
         val allProducts = mapOf(
             carne to 100, pescado to 100, pollo to 100,
@@ -52,6 +54,15 @@ class SupermarketChainTest {
         supermarketC = Supermarket(3, "Supermercado C", allProducts)
 
         chain = SupermarketChain(listOf(supermarketA, supermarketB, supermarketC))
+    }
+
+    // --- duplicate ID validation ---
+
+    @Test
+    fun `should reject duplicate supermarket IDs`() {
+        assertThrows<IllegalArgumentException> {
+            SupermarketChain(listOf(supermarketA, supermarketA))
+        }
     }
 
     // --- getTopFiveProducts ---
@@ -91,12 +102,12 @@ class SupermarketChainTest {
         supermarketA.registerSale(1, 3) // 30.0
         supermarketB.registerSale(2, 2) // 40.0
         supermarketC.registerSale(3, 1) // 30.0
-        assertEquals(100.0, chain.getTotalRevenue())
+        assertEquals(BigDecimal("100.0"), chain.getTotalRevenue())
     }
 
     @Test
     fun `getTotalRevenue should return zero when no sales`() {
-        assertEquals(0.0, chain.getTotalRevenue())
+        assertEquals(BigDecimal.ZERO, chain.getTotalRevenue())
     }
 
     // --- getHighestRevenueSupermarket ---
@@ -146,9 +157,5 @@ class SupermarketChainTest {
         // supermarketC has no business hours, should never appear
         val result = chain.getOpenSupermarketsAt(DayOfWeek.MONDAY, LocalTime.of(12, 0))
         assertFalse(result.contains("Supermercado C"))
-    }
-
-    private fun assertFalse(condition: Boolean) {
-        org.junit.jupiter.api.Assertions.assertFalse(condition)
     }
 }

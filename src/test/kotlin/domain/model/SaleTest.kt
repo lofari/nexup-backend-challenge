@@ -1,17 +1,18 @@
-package model
+package domain.model
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 
 class SaleTest {
 
-    private val product = Product(1, "Carne", 10.0)
+    private val product = Product(1, "Carne", BigDecimal("10.0"))
 
     @Test
     fun `should calculate total correctly`() {
         val sale = Sale(product, 3)
-        assertEquals(30.0, sale.total)
+        assertEquals(BigDecimal("30.0"), sale.total)
     }
 
     @Test
@@ -23,11 +24,15 @@ class SaleTest {
 
     @Test
     fun `should reject zero quantity`() {
-        assertThrows<IllegalArgumentException> { Sale(product, 0) }
+        assertThrows<IllegalArgumentException> {
+            Sale(product, 0)
+        }
     }
 
     @Test
     fun `should reject negative quantity`() {
-        assertThrows<IllegalArgumentException> { Sale(product, -1) }
+        assertThrows<IllegalArgumentException> {
+            Sale(product, -1)
+        }
     }
 }

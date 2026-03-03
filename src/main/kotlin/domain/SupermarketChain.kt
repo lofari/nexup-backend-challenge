@@ -1,11 +1,16 @@
 package domain
 
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalTime
 
 class SupermarketChain(
     private val supermarkets: List<Supermarket>
 ) {
+    init {
+        val ids = supermarkets.map { it.id }
+        require(ids.size == ids.toSet().size) { "Duplicate supermarket IDs found" }
+    }
 
     /**
      * Returns the top 5 best-selling products across all supermarkets.
@@ -23,7 +28,7 @@ class SupermarketChain(
     }
 
     /** Returns the total revenue across all supermarkets. */
-    fun getTotalRevenue(): Double {
+    fun getTotalRevenue(): BigDecimal {
         return supermarkets.sumOf { it.getTotalRevenue() }
     }
 

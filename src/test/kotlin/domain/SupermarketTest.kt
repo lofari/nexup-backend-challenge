@@ -1,13 +1,14 @@
 package domain
 
-import model.BusinessHours
-import model.Product
+import domain.model.BusinessHours
+import domain.model.Product
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -19,8 +20,8 @@ class SupermarketTest {
 
     @BeforeEach
     fun setUp() {
-        carne = Product(1, "Carne", 10.0)
-        pescado = Product(2, "Pescado", 20.0)
+        carne = Product(1, "Carne", BigDecimal("10.0"))
+        pescado = Product(2, "Pescado", BigDecimal("20.0"))
         supermarket = Supermarket(
             id = 1,
             name = "Supermercado A",
@@ -28,12 +29,35 @@ class SupermarketTest {
         )
     }
 
+    // --- constructor validation ---
+
+    @Test
+    fun `should reject non-positive id`() {
+        assertThrows<IllegalArgumentException> {
+            Supermarket(0, "Test", mapOf(carne to 10))
+        }
+    }
+
+    @Test
+    fun `should reject blank name`() {
+        assertThrows<IllegalArgumentException> {
+            Supermarket(1, "  ", mapOf(carne to 10))
+        }
+    }
+
+    @Test
+    fun `should reject negative initial stock`() {
+        assertThrows<IllegalArgumentException> {
+            Supermarket(1, "Test", mapOf(carne to -5))
+        }
+    }
+
     // --- registerSale ---
 
     @Test
     fun `registerSale should return total price`() {
         val total = supermarket.registerSale(1, 3)
-        assertEquals(30.0, total)
+        assertEquals(BigDecimal("30.0"), total)
     }
 
     @Test
@@ -103,12 +127,12 @@ class SupermarketTest {
     fun `getSalesRevenue should return revenue for product`() {
         supermarket.registerSale(1, 3) // 30.0
         supermarket.registerSale(1, 2) // 20.0
-        assertEquals(50.0, supermarket.getSalesRevenue(1))
+        assertEquals(BigDecimal("50.0"), supermarket.getSalesRevenue(1))
     }
 
     @Test
     fun `getSalesRevenue should return zero when no sales`() {
-        assertEquals(0.0, supermarket.getSalesRevenue(1))
+        assertEquals(BigDecimal.ZERO, supermarket.getSalesRevenue(1))
     }
 
     @Test
@@ -124,12 +148,12 @@ class SupermarketTest {
     fun `getTotalRevenue should sum all sales`() {
         supermarket.registerSale(1, 3) // 30.0
         supermarket.registerSale(2, 2) // 40.0
-        assertEquals(70.0, supermarket.getTotalRevenue())
+        assertEquals(BigDecimal("70.0"), supermarket.getTotalRevenue())
     }
 
     @Test
     fun `getTotalRevenue should return zero when no sales`() {
-        assertEquals(0.0, supermarket.getTotalRevenue())
+        assertEquals(BigDecimal.ZERO, supermarket.getTotalRevenue())
     }
 
     // --- isOpenAt ---

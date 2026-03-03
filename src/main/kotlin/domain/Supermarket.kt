@@ -1,8 +1,9 @@
 package domain
 
-import model.BusinessHours
-import model.Product
-import model.Sale
+import domain.model.BusinessHours
+import domain.model.Product
+import domain.model.Sale
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -16,22 +17,29 @@ class Supermarket(
     private val stock: MutableMap<Int, Int> = initialStock.entries.associate { it.key.id to it.value }.toMutableMap()
     private val sales: MutableList<Sale> = mutableListOf()
 
+    init {
+        require(id > 0) { "Supermarket ID must be positive" }
+        require(name.isNotBlank()) { "Supermarket name must not be blank" }
+        initialStock.forEach { (product, qty) ->
+            require(qty >= 0) { "Stock for '${product.name}' must not be negative" }
+        }
+    }
+
     /**
      * Registers a sale for the given product and quantity.
      * Deducts stock and records the sale.
      * @return the total price of the sale
      * @throws IllegalArgumentException if product not found, quantity invalid, or insufficient stock
      */
-    fun registerSale(productId: Int, quantity: Int): Double {
-        require(quantity > 0) { "Quantity must be positive" }
+    fun registerSale(productId: Int, quantity: Int): BigDecimal {
         val product = findProduct(productId)
+        val sale = Sale(product, quantity)
         val currentStock = stock.getValue(productId)
         require(currentStock >= quantity) {
             "Insufficient stock for '${product.name}'. Available: $currentStock, requested: $quantity"
         }
 
         stock[productId] = currentStock - quantity
-        val sale = Sale(product, quantity)
         sales.add(sale)
         return sale.total
     }
@@ -43,13 +51,13 @@ class Supermarket(
     }
 
     /** Returns the total revenue from sales of the given product. */
-    fun getSalesRevenue(productId: Int): Double {
+    fun getSalesRevenue(productId: Int): BigDecimal {
         findProduct(productId)
         return sales.filter { it.product.id == productId }.sumOf { it.total }
     }
 
     /** Returns the total revenue from all sales. */
-    fun getTotalRevenue(): Double = sales.sumOf { it.total }
+    fun getTotalRevenue(): BigDecimal = sales.sumOf { it.total }
 
     /** Returns the current stock level for the given product. */
     fun getStock(productId: Int): Int {
